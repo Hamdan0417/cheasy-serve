@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    
     <style>
         body {
             font-family: 'Tajawal', sans-serif;
@@ -27,7 +27,7 @@
             background-image: linear-gradient(to right, #2563eb, #d97706);
         }
         [x-cloak] { display: none !important; }
-
+        
         .fade-enter-active, .fade-leave-active {
             transition: opacity 0.5s ease;
         }
@@ -36,14 +36,26 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800"
-      x-data="{
-          viewMode: 'strategic',
+<body class="bg-gray-50 text-gray-800" 
+      x-data="{ 
+          viewMode: 'strategic', 
           mobileMenuOpen: false,
           showTermSheet: false,
+          showSecretModal: false,
+          secretPassword: '',
+          isAuthorized: false,
           activeTab: 'product',
-          toggleView() {
-              this.viewMode = this.viewMode === 'strategic' ? 'partner' : 'strategic';
+          checkPassword() {
+              if(this.secretPassword === 'Serve@2030') {
+                  this.isAuthorized = true;
+                  this.showSecretModal = false;
+                  window.scrollTo({top: document.getElementById('master-plan').offsetTop, behavior: 'smooth'});
+              } else {
+                  alert('رمز الدخول غير صحيح');
+              }
+          },
+          toggleView() { 
+              this.viewMode = this.viewMode === 'strategic' ? 'partner' : 'strategic'; 
               window.scrollTo({top: 0, behavior: 'smooth'});
           }
       }">
@@ -54,7 +66,8 @@
             <div class="flex justify-between items-center h-20">
                 <!-- Logos -->
                 <div class="flex items-center gap-4">
-                    <img src="assets/serve_logo.png" alt="Serve Logo" class="h-10 w-auto">
+                    <!-- Note: Using existing webp as png was not found, can be swapped easily -->
+                    <img src="assets/serve_logo.webp" alt="Serve Logo" class="h-10 w-auto">
                     <span class="text-xl font-bold text-gray-300">×</span>
                     <img src="assets/cheasy_logo.png" alt="Cheasy Logo" class="h-10 w-auto">
                 </div>
@@ -65,9 +78,16 @@
                     <a href="#structure" class="text-gray-600 hover:text-blue-600 font-medium transition" x-show="viewMode === 'strategic'">الهيكل</a>
                     <a href="#funding" class="text-gray-600 hover:text-blue-600 font-medium transition">التمويل</a>
                     <a href="#roadmap" class="text-gray-600 hover:text-blue-600 font-medium transition">الخطة</a>
+                    
+                    <!-- Secret Plan Button -->
+                    <button @click="isAuthorized ? window.scrollTo({top: document.getElementById('master-plan').offsetTop, behavior: 'smooth'}) : showSecretModal = true" 
+                            class="text-amber-600 hover:text-amber-700 font-bold text-sm flex items-center gap-1">
+                        <i class="fas fa-lock"></i>
+                        <span>الخطة المرجعية</span>
+                    </button>
 
                     <!-- View Switcher -->
-                    <button @click="toggleView()"
+                    <button @click="toggleView()" 
                             class="px-4 py-2 rounded-full text-xs font-bold border transition-colors flex items-center gap-2"
                             :class="viewMode === 'strategic' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-900 border-gray-300'">
                         <i class="fas fa-sync-alt" :class="{'fa-spin': false}"></i>
@@ -81,7 +101,7 @@
                 </button>
             </div>
         </div>
-
+        
         <!-- Mobile Menu -->
         <div x-show="mobileMenuOpen" @click.away="mobileMenuOpen = false" class="md:hidden bg-white border-t border-gray-100 p-4 shadow-lg" x-transition>
             <div class="flex flex-col space-y-4">
@@ -89,12 +109,39 @@
                 <a href="#structure" @click="mobileMenuOpen = false" class="text-gray-600 font-medium" x-show="viewMode === 'strategic'">الهيكل</a>
                 <a href="#funding" @click="mobileMenuOpen = false" class="text-gray-600 font-medium">التمويل</a>
                 <a href="#roadmap" @click="mobileMenuOpen = false" class="text-gray-600 font-medium">الخطة</a>
+                <button @click="isAuthorized ? window.scrollTo({top: document.getElementById('master-plan').offsetTop, behavior: 'smooth'}) : showSecretModal = true; mobileMenuOpen = false" class="text-amber-600 font-bold text-right">
+                    <i class="fas fa-lock ml-2"></i> الخطة المرجعية
+                </button>
                 <button @click="toggleView(); mobileMenuOpen = false" class="text-center w-full py-2 bg-gray-100 rounded-lg text-sm font-bold">
                     تبديل العرض
                 </button>
             </div>
         </div>
     </header>
+
+    <!-- Secret Access Modal -->
+    <div x-show="showSecretModal" class="relative z-[60]" aria-labelledby="modal-title" role="dialog" aria-modal="true" x-cloak>
+        <div class="fixed inset-0 bg-gray-900/90 transition-opacity backdrop-blur-sm" x-show="showSecretModal" x-transition.opacity></div>
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center">
+                <div class="relative transform overflow-hidden rounded-2xl bg-white text-right shadow-2xl transition-all sm:w-full sm:max-w-md p-8" @click.away="showSecretModal = false">
+                    <div class="text-center mb-6">
+                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 mb-4">
+                            <i class="fas fa-lock text-2xl text-amber-600"></i>
+                        </div>
+                        <h3 class="text-xl font-bold leading-6 text-gray-900">منطقة محظورة</h3>
+                        <p class="text-sm text-gray-500 mt-2">الرجاء إدخال الرمز السري للوصول إلى الخطة المرجعية التفصيلية.</p>
+                    </div>
+                    <div class="space-y-4">
+                        <input type="password" x-model="secretPassword" @keydown.enter="checkPassword()" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none text-center text-lg" placeholder="أدخل الرمز هنا">
+                        <button @click="checkPassword()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-lg transition shadow-lg">
+                            دخول
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Hero Section -->
     <section class="relative pt-32 pb-20 overflow-hidden bg-white">
@@ -105,12 +152,12 @@
                     <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
                     مقترح شراكة وتكامل استراتيجي
                 </div>
-
+                
                 <h1 class="text-4xl md:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
                     التحول الرقمي لخدمات الصيانة <br>
                     <span class="gradient-text">Serve</span> <span class="text-gray-300">×</span> <span class="gradient-text">Cheasy</span>
                 </h1>
-
+                
                 <p class="text-xl text-gray-600 mb-10 leading-relaxed" x-show="viewMode === 'strategic'">
                     عرض تكامل وشراكة (Equity Swap) وتمويل نمو بقيمة <span class="font-bold text-gray-900">15 مليون ريال</span>
                     <br>لتوسيع تطبيق Serve والتهيئة لطرح Cheasy Token.
@@ -167,7 +214,7 @@
                 <!-- Serve Side -->
                 <div class="bg-white/5 p-8 rounded-3xl border border-white/10 w-full md:w-1/3 relative">
                     <div class="absolute -top-6 right-8 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-bold">الكيان الأول</div>
-                    <img src="assets/serve_logo.png" class="h-12 mb-6 brightness-200 contrast-0 grayscale mx-auto opacity-80" alt="Serve">
+                    <img src="assets/serve_logo.webp" class="h-12 mb-6 brightness-200 contrast-0 grayscale mx-auto opacity-80" alt="Serve">
                     <h3 class="text-xl font-bold mb-4 text-center">تطبيق Serve</h3>
                     <ul class="space-y-4 text-sm text-gray-300">
                         <li class="flex justify-between items-center border-b border-white/10 pb-2">
@@ -236,7 +283,7 @@
                     <div class="border border-gray-100 rounded-3xl p-8 bg-blue-50/50 relative overflow-hidden" :class="viewMode === 'partner' ? 'hidden' : 'block'">
                         <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
                         <h4 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                            <img src="assets/cheasy_logo.png" class="h-8 w-auto">
+                            <img src="assets/cheasy_logo.png" class="h-8 w-auto"> 
                             <span>9.0 مليون ريال</span>
                         </h4>
                         <div class="space-y-4">
@@ -275,7 +322,7 @@
                     <div class="border border-gray-100 rounded-3xl p-8 bg-amber-50/50 relative overflow-hidden w-full" :class="viewMode === 'partner' ? 'md:col-span-2' : ''">
                         <div class="absolute top-0 left-0 w-2 h-full bg-amber-500"></div>
                         <h4 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                            <img src="assets/serve_logo.png" class="h-8 w-auto">
+                            <img src="assets/serve_logo.webp" class="h-8 w-auto">
                             <span>6.0 مليون ريال</span>
                         </h4>
                         <div class="space-y-4">
@@ -307,8 +354,8 @@
 
                 <!-- Mechanism Tab -->
                 <div x-show="activeFundTab === 'mechanism'" x-transition class="bg-gray-50 rounded-3xl p-8 border border-gray-200">
-                    <ol class="relative border-r border-gray-200 mr-4">
-                        <li class="mb-10 mr-6">
+                    <ol class="relative border-r border-gray-200 mr-4">                  
+                        <li class="mb-10 mr-6">            
                             <span class="absolute flex items-center justify-center w-8 h-8 bg-blue-100 rounded-full -mr-4 ring-8 ring-white">
                                 <span class="text-blue-600 font-bold">1</span>
                             </span>
@@ -446,7 +493,7 @@
                             </div>
                         </div>
                     </div>
-
+                    
                     <!-- Compliance Tab -->
                     <div x-show="activeTab === 'compliance'" x-transition class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
                          <h3 class="text-2xl font-bold mb-6 text-gray-900">الامتثال والمخاطر</h3>
@@ -570,6 +617,97 @@
         </div>
     </section>
 
+    <!-- Master Plan / Internal Reference (Protected) -->
+    <section id="master-plan" class="py-20 bg-amber-50 border-t-4 border-amber-500" x-show="isAuthorized" x-transition>
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center gap-4 mb-10 pb-6 border-b border-amber-200">
+                <div class="bg-amber-600 text-white p-3 rounded-xl"><i class="fas fa-file-contract text-2xl"></i></div>
+                <div>
+                    <h2 class="text-3xl font-bold text-gray-900">الخطة المرجعية التفصيلية</h2>
+                    <p class="text-amber-800 text-sm font-bold">وثيقة مرجعية داخلية – سري للغاية (Internal Use Only)</p>
+                </div>
+            </div>
+            
+            <div class="prose prose-lg max-w-none text-gray-700">
+                <!-- Content copied from the detailed prompt -->
+                <h3 class="text-xl font-bold text-gray-900">1. الملخص التنفيذي</h3>
+                <p>يهدف هذا العرض إلى إنشاء شراكة استراتيجية بين Cheasy (متجر + عملة/Token) و Serve عبر:</p>
+                <ul class="list-disc pr-6">
+                    <li>تبادل حصص ملكية يضمن تحالفًا طويل المدى.</li>
+                    <li>تمويل نمو وتسريع التنفيذ عبر تمويل يصل إلى 15 مليون ريال (بضمان حكومي) لدعم توسع Serve والتهيئة لطرح Cheasy.</li>
+                    <li>تكامل تقني وتشغيلي يرفع الطلب على خدمات Serve ويوسّع قاعدة مستخدمي Cheasy ويُحسّن تجربة العميل.</li>
+                </ul>
+
+                <h3 class="text-xl font-bold text-gray-900 mt-8">2. الأطراف ونطاق الشراكة</h3>
+                <p><strong>الأفراد:</strong> مالك الغامدي (مالك Serve)، حمدان الغامدي، هاشم الغامدي.<br>
+                <strong>الكيانات:</strong> Cheasy Store + Cheasy Token، تطبيق Serve للصيانة.</p>
+
+                <h3 class="text-xl font-bold text-gray-900 mt-8">3. هيكل الصفقة (تبادل الحصص)</h3>
+                <p><strong>تبادل الملكية (Equity Swap):</strong><br>
+                - يحصل حمدان الغامدي على 15% من Serve.<br>
+                - يحصل هاشم الغامدي على 15% من Serve.<br>
+                (المجموع: 30% مناصفة).<br>
+                - المقابل: يحصل مالك الغامدي باسمه على 30% من مشروع Cheasy.</p>
+                <p><strong>آلية النقل:</strong> يتم تنفيذ نسبة 30% كتحويل من حصة مالك الغامدي الحالية (لا يوجد إصدار حصص جديد). يتم توثيق التحويل عند الإقفال (Closing).</p>
+
+                <h3 class="text-xl font-bold text-gray-900 mt-8">4. التمويل المقترح (15 مليون ريال)</h3>
+                <p><strong>الفكرة:</strong> طلب تمويل بقيمة 15,000,000 ريال.<br>
+                - 9,000,000 ريال لـ Cheasy (تسويق + طرح أولي).<br>
+                - 6,000,000 ريال لـ Serve (تطوير + تشغيل + خدمة دين).<br>
+                <strong>شرط السداد:</strong> عند جمع حد أدنى 5,000,000 دولار من الطرح/الاستثمار، يتم سداد التمويل فوراً.</p>
+
+                <h3 class="text-xl font-bold text-gray-900 mt-8">5. استخدامات التمويل التفصيلية</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div class="bg-white p-4 rounded-lg shadow-sm border">
+                        <h4 class="font-bold text-blue-600 mb-2">Cheasy (9.0M)</h4>
+                        <ul class="text-sm list-disc pr-4 space-y-1">
+                            <li>4.0م: حملات اكتساب العملاء.</li>
+                            <li>2.0م: بناء مجتمع وولاء.</li>
+                            <li>1.5م: تجهيزات الطرح (Listing).</li>
+                            <li>1.0م: عمليات وتجهيزات تقنية.</li>
+                            <li>0.5م: قانوني وامتثال.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border">
+                        <h4 class="font-bold text-amber-600 mb-2">Serve (6.0M)</h4>
+                        <ul class="text-sm list-disc pr-4 space-y-1">
+                            <li>1.0م: مبلغ مجنب لخدمة السداد (احتياطي).</li>
+                            <li>2.0م: تطوير المنتج (تطبيق/لوحة تحكم).</li>
+                            <li>1.0م: تشغيل وتوسع ودعم عملاء.</li>
+                            <li>0.8م: بنية تحتية وأمن سيبراني.</li>
+                            <li>0.7م: إطلاق خدمات جديدة.</li>
+                            <li>0.5م: احتياطي مخاطر.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-900 mt-8">6. الخطة التقنية والتشغيلية</h3>
+                <p><strong>أهداف المنتج:</strong> تحسين تجربة العميل، تمكين الفنيين، فتح قنوات B2B.<br>
+                <strong>التكامل:</strong> استخدام نقاط Cheasy كخصومات في Serve، نظام إحالات موحد، إمكانية الدفع بالـ Token (اختياري).<br>
+                <strong>الامتثال:</strong> تأسيس شركة في الإكوادور لـ Cheasy، الالتزام بمتطلبات KYC/AML.</p>
+
+                <h3 class="text-xl font-bold text-gray-900 mt-8">7. الخطة الزمنية (12 شهر)</h3>
+                <ul class="list-decimal pr-6 space-y-2">
+                    <li><strong>التهيئة (ديسمبر 2025):</strong> توقيع MoU + NDA، تشكيل لجنة.</li>
+                    <li><strong>المرحلة 1 (يناير-فبراير 2026):</strong> ملف التمويل والجاهزية.</li>
+                    <li><strong>المرحلة 2 (مارس-مايو 2026):</strong> تطوير Serve وتشغيله.</li>
+                    <li><strong>المرحلة 3 (يونيو-أغسطس 2026):</strong> التكامل وحملات النمو.</li>
+                    <li><strong>المرحلة 4 (سبتمبر-أكتوبر 2026):</strong> تجهيز الطرح.</li>
+                    <li><strong>المرحلة 5 (نوفمبر-ديسمبر 2026):</strong> السداد المبكر والإقفال.</li>
+                </ul>
+
+                <h3 class="text-xl font-bold text-gray-900 mt-8">8. الحوكمة والمخاطر</h3>
+                <p><strong>الحوكمة:</strong> لجنة إدارة أسبوعية، تقارير شهرية، قيود التصرف بالحصص (Lock-up).<br>
+                <strong>المخاطر:</strong> تأخر التمويل (خطة بديلة: ملائكي)، تأخر التراخيص (خطة بديلة: SAFT/Escrow).</p>
+
+                <div class="mt-12 p-6 bg-red-50 border border-red-200 rounded-xl text-center">
+                    <p class="font-bold text-red-800">نهاية الوثيقة المرجعية</p>
+                    <p class="text-sm text-red-600">هذه المعلومات سرية للغاية ومخصصة للشركاء فقط.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- KPIs Section -->
     <section class="py-20 bg-white border-t border-gray-100">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -617,7 +755,7 @@
                             <!-- Just a summary of the Term Sheet content -->
                             <h4 class="font-bold text-gray-900">الأطراف</h4>
                             <p>مالك الغامدي (Serve)، حمدان الغامدي، هاشم الغامدي.</p>
-
+                            
                             <h4 class="font-bold text-gray-900 mt-4">هيكل الصفقة</h4>
                             <ul class="list-disc pr-5">
                                 <li><strong>Serve:</strong> نقل 30% (15% حمدان + 15% هاشم) من حصة المالك الحالي.</li>
